@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Análise de Regressão</title>
+    <style>
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .form-section { margin-bottom: 30px; background: #f8f9fa; padding: 20px; border-radius: 8px; }
+        .error { color: #dc3545; margin-bottom: 15px; padding: 10px; background: #f8d7da; border-radius: 4px; }
+        .columns-container { display: flex; justify-content: space-between; gap: 20px; }
+        .column { flex: 1; }
+        .checkbox-group { max-height: 300px; overflow-y: auto; border: 1px solid #dee2e6; padding: 15px; border-radius: 4px; background: white; }
+        .recommendations { margin-top: 20px; padding: 15px; background: #e7f1ff; border-radius: 4px; }
+        .recommendation { margin-bottom: 10px; padding: 10px; background: white; border-radius: 4px; border-left: 4px solid #0d6efd; }
+        .btn { background: #0d6efd; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
+        .btn:hover { background: #0b5ed7; }
+        .section-title { margin-top: 0; color: #212529; border-bottom: 2px solid #0d6efd; padding-bottom: 10px; }
+    </style>
+    <script>
+        function showRecommendations(target) {
+            document.querySelectorAll('.recommendation-group').forEach(group => {
+                group.style.display = 'none';
+            });
+            
+            if (target) {
+                document.getElementById(`rec-${target}`).style.display = 'block';
+            }
+        }
+        
+        function applyRecommendation(features) {
+            const checkboxes = document.querySelectorAll('input[name="features"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = features.includes(checkbox.value);
+            });
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Análise de Regressão Linear - Estatísticas de Futebol</h1>
+        
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+        
+        <form method="POST">
+            <div class="columns-container">
+                <div class="column">
+                    <div class="form-section">
+                        <h2 class="section-title">Variável Dependente (Alvo)</h2>
+                        <p>Selecione o que deseja prever:</p>
+                        <div class="checkbox-group">
+                            {% for column in columns %}
+                                <div>
+                                    <input type="radio" name="target" value="{{ column }}" id="target_{{ column }}"
+                                           onclick="showRecommendations('{{ column }}')">
+                                    <label for="target_{{ column }}">{{ column }}</label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="column">
+                    <div class="form-section">
+                        <h2 class="section-title">Variáveis Independentes</h2>
+                        <p>Selecione as variáveis preditoras:</p>
+                        <div class="checkbox-group">
+                            {% for column in columns %}
+                                <div>
+                                    <input type="checkbox" name="features" value="{{ column }}" id="feature_{{ column }}">
+                                    <label for="feature_{{ column }}">{{ column }}</label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="recommendations">
+                <h3>Combinações Recomendadas</h3>
+                <p>Selecione uma variável dependente para ver recomendações:</p>
+                
+                {% for target, recs in recommendations.items() %}
+                    <div id="rec-{{ target }}" class="recommendation-group" style="display: none;">
+                        {% for rec in recs %}
+                            <div class="recommendation">
+                                <strong>Opção {{ loop.index }}:</strong> {{ rec|join(', ') }}
+                                <button type="button" class="btn" style="padding: 5px 10px; margin-left: 10px;"
+                                        onclick="applyRecommendation({{ rec }})">
+                                    Aplicar
+                                </button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <button type="submit" class="btn">Executar Regressão</button>
+        </form>
+    </div>
+</body>
+</html>

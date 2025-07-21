@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Resultados da Regressão</title>
+    <style>
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .metrics { margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px; }
+        .plots-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 30px; }
+        .plot { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.05); }
+        .plot img { width: 100%; border: 1px solid #dee2e6; }
+        .coefficients { margin-top: 20px; }
+        .coef-table { width: 100%; border-collapse: collapse; }
+        .coef-table th, .coef-table td { padding: 10px; text-align: left; border-bottom: 1px solid #dee2e6; }
+        .coef-table tr:nth-child(even) { background: #f8f9fa; }
+        .btn { background: #0d6efd; color: white; border: none; padding: 10px 20px; border-radius: 4px; text-decoration: none; display: inline-block; }
+        .btn:hover { background: #0b5ed7; }
+        .interpretation { margin: 20px 0; padding: 15px; background: #e7f5ff; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Resultados da Regressão</h1>
+        
+        <div class="metrics">
+            <h2>Métricas do Modelo</h2>
+            <p><strong>Variável dependente:</strong> {{ target }}</p>
+            <p><strong>Variáveis independentes:</strong> {{ ', '.join(features) }}</p>
+            <p><strong>MAE (Erro Médio Absoluto):</strong> {{ mae|round(2) }}</p>
+            <p><strong>R² (Coeficiente de Determinação):</strong> {{ r2|round(4) }}</p>
+            
+            <div class="interpretation">
+                <h3>Interpretação:</h3>
+                {% if r2 >= 0.7 %}
+                    <p>✅ Modelo com excelente poder explicativo (R² > 0.7)</p>
+                {% elif r2 >= 0.5 %}
+                    <p>👍 Modelo com bom poder explicativo (R² > 0.5)</p>
+                {% elif r2 >= 0.3 %}
+                    <p>⚠️ Modelo com moderado poder explicativo (R² > 0.3)</p>
+                {% else %}
+                    <p>❌ Modelo com baixo poder explicativo (R² < 0.3)</p>
+                {% endif %}
+                
+                <p><strong>MAE:</strong> O modelo erra em média {{ mae|round(2) }} gols por partida</p>
+            </div>
+        </div>
+        
+        <div class="coefficients">
+            <h2>Impacto das Variáveis</h2>
+            <table class="coef-table">
+                <thead>
+                    <tr>
+                        <th>Variável</th>
+                        <th>Coeficiente</th>
+                        <th>Interpretação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for feature, coef in coefficients.items() %}
+                    <tr>
+                        <td>{{ feature }}</td>
+                        <td>{{ coef|round(4) }}</td>
+                        <td>
+                            {% if coef > 0.5 %}
+                                Forte impacto positivo
+                            {% elif coef > 0.2 %}
+                                Impacto positivo moderado
+                            {% elif coef > 0 %}
+                                Pequeno impacto positivo
+                            {% elif coef < -0.5 %}
+                                Forte impacto negativo
+                            {% elif coef < -0.2 %}
+                                Impacto negativo moderado
+                            {% else %}
+                                Pequeno impacto negativo
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="plots-container">
+            <div class="plot">
+                <h3>Valores Reais vs Previstos</h3>
+                <img src="data:image/png;base64,{{ plot_urls['real_vs_pred'] }}">
+            </div>
+            <div class="plot">
+                <h3>Análise de Resíduos</h3>
+                <img src="data:image/png;base64,{{ plot_urls['residuals'] }}">
+            </div>
+            <div class="plot">
+                <h3>Distribuição dos Resíduos</h3>
+                <img src="data:image/png;base64,{{ plot_urls['residuals_dist'] }}">
+            </div>
+            {% if 'coefficients' in plot_urls %}
+            <div class="plot">
+                <h3>Coeficientes do Modelo</h3>
+                <img src="data:image/png;base64,{{ plot_urls['coefficients'] }}">
+            </div>
+            {% endif %}
+        </div>
+        
+        <a href="/" class="btn">Nova Análise</a>
+    </div>
+</body>
+</html>
