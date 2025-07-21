@@ -1,19 +1,179 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Análise de Regressão</title>
+    <title>Análise de Regressão - {{ team }}</title>
     <style>
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        .form-section { margin-bottom: 30px; background: #f8f9fa; padding: 20px; border-radius: 8px; }
-        .error { color: #dc3545; margin-bottom: 15px; padding: 10px; background: #f8d7da; border-radius: 4px; }
-        .columns-container { display: flex; justify-content: space-between; gap: 20px; }
-        .column { flex: 1; }
-        .checkbox-group { max-height: 300px; overflow-y: auto; border: 1px solid #dee2e6; padding: 15px; border-radius: 4px; background: white; }
-        .recommendations { margin-top: 20px; padding: 15px; background: #e7f1ff; border-radius: 4px; }
-        .recommendation { margin-bottom: 10px; padding: 10px; background: white; border-radius: 4px; border-left: 4px solid #0d6efd; }
-        .btn { background: #0d6efd; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
-        .btn:hover { background: #0b5ed7; }
-        .section-title { margin-top: 0; color: #212529; border-bottom: 2px solid #0d6efd; padding-bottom: 10px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            color: #343a40;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 25px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .team-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: #f1f3f5;
+            border: 2px solid #eee;
+        }
+        
+        .team-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 5px;
+        }
+        
+        .team-title {
+            font-size: 1.8rem;
+            color: #2c3e50;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: #5a6268;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        
+        .form-container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+        
+        .form-section {
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 1.4rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+        }
+        
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            padding: 15px 0;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            transition: background 0.2s ease;
+        }
+        
+        .checkbox-item:hover {
+            background: #e9ecef;
+        }
+        
+        .checkbox-item input {
+            margin-right: 12px;
+            width: 18px;
+            height: 18px;
+        }
+        
+        .recommendations {
+            background: #e3f2fd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        
+        .recommendation-group {
+            display: none;
+        }
+        
+        .recommendation {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            margin-left: 10px;
+            background: #3498db;
+        }
+        
+        .btn-submit {
+            background: #27ae60;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            display: block;
+            margin: 30px auto 0;
+        }
+        
+        .btn-submit:hover {
+            background: #219653;
+        }
+        
+        .error {
+            background: #ffeef0;
+            color: #e74c3c;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
     </style>
     <script>
         function showRecommendations(target) {
@@ -36,43 +196,49 @@
 </head>
 <body>
     <div class="container">
-        <h1>Análise de Regressão Linear - Estatísticas de Futebol</h1>
+        <div class="header">
+            <div class="header-content">
+                {% if team in team_logos %}
+                <div class="team-logo">
+                    <img src="{{ url_for('static', filename=team_logos[team]) }}" alt="{{ team }}">
+                </div>
+                {% endif %}
+                <h1 class="team-title">Análise: {{ team }}</h1>
+            </div>
+            <a href="/" class="btn">Trocar Time</a>
+        </div>
         
         {% if error %}
             <div class="error">{{ error }}</div>
         {% endif %}
         
-        <form method="POST">
-            <div class="columns-container">
-                <div class="column">
-                    <div class="form-section">
-                        <h2 class="section-title">Variável Dependente (Alvo)</h2>
-                        <p>Selecione o que deseja prever:</p>
-                        <div class="checkbox-group">
-                            {% for column in columns %}
-                                <div>
-                                    <input type="radio" name="target" value="{{ column }}" id="target_{{ column }}"
-                                           onclick="showRecommendations('{{ column }}')">
-                                    <label for="target_{{ column }}">{{ column }}</label>
-                                </div>
-                            {% endfor %}
+        <form method="POST" action="/run_analysis" class="form-container">
+            <input type="hidden" name="team" value="{{ team }}">
+            
+            <div class="form-section">
+                <h2 class="section-title">Variável Dependente (Alvo)</h2>
+                <p>Selecione o que deseja prever:</p>
+                <div class="checkbox-group">
+                    {% for column in columns %}
+                        <div class="checkbox-item">
+                            <input type="radio" name="target" value="{{ column }}" id="target_{{ column }}"
+                                   onclick="showRecommendations('{{ column }}')">
+                            <label for="target_{{ column }}">{{ pretty_names.get(column, column) }}</label>
                         </div>
-                    </div>
+                    {% endfor %}
                 </div>
-                
-                <div class="column">
-                    <div class="form-section">
-                        <h2 class="section-title">Variáveis Independentes</h2>
-                        <p>Selecione as variáveis preditoras:</p>
-                        <div class="checkbox-group">
-                            {% for column in columns %}
-                                <div>
-                                    <input type="checkbox" name="features" value="{{ column }}" id="feature_{{ column }}">
-                                    <label for="feature_{{ column }}">{{ column }}</label>
-                                </div>
-                            {% endfor %}
+            </div>
+            
+            <div class="form-section">
+                <h2 class="section-title">Variáveis Independentes</h2>
+                <p>Selecione as variáveis preditoras:</p>
+                <div class="checkbox-group">
+                    {% for column in columns %}
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="features" value="{{ column }}" id="feature_{{ column }}">
+                            <label for="feature_{{ column }}">{{ pretty_names.get(column, column) }}</label>
                         </div>
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
             
@@ -80,12 +246,15 @@
                 <h3>Combinações Recomendadas</h3>
                 <p>Selecione uma variável dependente para ver recomendações:</p>
                 
-                {% for target, recs in recommendations.items() %}
-                    <div id="rec-{{ target }}" class="recommendation-group" style="display: none;">
+                {% for target_name, recs in recommendations.items() %}
+                    <div id="rec-{{ target_name }}" class="recommendation-group">
                         {% for rec in recs %}
                             <div class="recommendation">
-                                <strong>Opção {{ loop.index }}:</strong> {{ rec|join(', ') }}
-                                <button type="button" class="btn" style="padding: 5px 10px; margin-left: 10px;"
+                                <strong>Opção {{ loop.index }}:</strong> 
+                                {% for var in rec -%}
+                                    {{ pretty_names.get(var, var) }}{% if not loop.last %}, {% endif %}
+                                {%- endfor %}
+                                <button type="button" class="btn btn-small"
                                         onclick="applyRecommendation({{ rec }})">
                                     Aplicar
                                 </button>
@@ -95,7 +264,7 @@
                 {% endfor %}
             </div>
             
-            <button type="submit" class="btn">Executar Regressão</button>
+            <button type="submit" class="btn btn-submit">Executar Análise</button>
         </form>
     </div>
 </body>
