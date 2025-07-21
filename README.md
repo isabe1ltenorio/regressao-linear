@@ -1,4 +1,4 @@
-#Análise de Regressão Linear
+# Análise de Regressão Linear
 
 Este projeto é uma aplicação web feita com Flask que permite carregar arquivos CSV com estatísticas de futebol e realizar análises de regressão linear com base em dados das partidas.
 
